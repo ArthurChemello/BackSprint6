@@ -1,0 +1,4 @@
+# Variáveis de ambiente (NUNCA subir pro GitHub)
+.env
+Secret.env
+*.env
