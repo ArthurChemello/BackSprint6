@@ -3,5 +3,8 @@
     "@nestjs/config": "^4.0.4",
     "@nestjs/mapped-types": "*",
     "@supabase/supabase-js": "^2.106.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1"
   }
 }
