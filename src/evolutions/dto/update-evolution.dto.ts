@@ -1,9 +1,9 @@
 import { IsDateString, IsOptional, IsString } from 'class-validator';
 
-export class UpdateAppointmentDto {
+export class UpdateEvolutionDto {
   @IsOptional()
   @IsString()
-  title?: string;
+  consultation_type?: string;
 
   @IsOptional()
   @IsDateString()

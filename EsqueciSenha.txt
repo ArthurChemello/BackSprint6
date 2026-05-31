@@ -1,0 +1,160 @@
+CREATE TABLE password_resets (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  email TEXT NOT NULL,
+  code TEXT NOT NULL,
+  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  used BOOLEAN DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+Depois adiciona dois métodos no auth.service.ts
+
+async forgotPassword(email: string) {
+  // Verifica se o email existe em doctors ou patients
+  const { data: doctor } = await this.supabaseService.supabase
+    .from('doctors')
+    .select('id, email')
+    .eq('email', email)
+    .single();
+
+  const { data: patient } = await this.supabaseService.supabase
+    .from('patients')
+    .select('id, email')
+    .eq('email', email)
+    .single();
+
+  if (!doctor && !patient) {
+    throw new Error('Email não encontrado');
+  }
+
+  // Gera código de 6 caracteres
+  const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+  const expires_at = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+
+  // Salva no banco
+  await this.supabaseService.supabase
+    .from('password_resets')
+    .insert({ email, code, expires_at });
+
+  // Envia email
+  await this.mailService.sendPasswordReset(email, code);
+
+  return { message: 'Código enviado para o email!' };
+}
+
+async resetPassword(email: string, code: string, newPassword: string) {
+  // Verifica o código
+  const { data: reset } = await this.supabaseService.supabase
+    .from('password_resets')
+    .select('*')
+    .eq('email', email)
+    .eq('code', code)
+    .eq('used', false)
+    .single();
+
+  if (!reset) throw new Error('Código inválido');
+
+  if (new Date() > new Date(reset.expires_at)) {
+    throw new Error('Código expirado');
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  // Atualiza senha em doctors
+  await this.supabaseService.supabase
+    .from('doctors')
+    .update({ password: hashedPassword })
+    .eq('email', email);
+
+  // Atualiza senha em patients
+  await this.supabaseService.supabase
+    .from('patients')
+    .update({ password: hashedPassword, first_login: false })
+    .eq('email', email);
+
+  // Marca código como usado
+  await this.supabaseService.supabase
+    .from('password_resets')
+    .update({ used: true })
+    .eq('id', reset.id);
+
+  return { message: 'Senha alterada com sucesso!' };
+}
+
+Adiciona as rotas no auth.controller.ts:
+
+@Post('forgot-password')
+forgotPassword(@Body() body: { email: string }) {
+  return this.authService.forgotPassword(body.email);
+}
+
+@Post('reset-password')
+resetPassword(@Body() body: { email: string; code: string; newPassword: string }) {
+  return this.authService.resetPassword(body.email, body.code, body.newPassword);
+}
+
+Adiciona o método no mail.service.ts:
+
+async sendPasswordReset(to: string, code: string) {
+  await this.resend.emails.send({
+    from: 'Lume System <onboarding@resend.dev>',
+    to,
+    subject: 'Redefinição de senha',
+    html: `
+      <h2>Redefinição de senha</h2>
+      <p>Seu código para redefinir a senha é:</p>
+      <h1 style="letter-spacing: 8px; color: #333;">${code}</h1>
+      <p>Este código expira em <strong>1 hora</strong>.</p>
+      <p style="color: #999; font-size: 12px;">Se você não solicitou a redefinição de senha, ignore este email.</p>
+    `,
+  });
+}
+
+E no auth.service.ts injeta o MailService no constructor:
+constructor(
+  private readonly jwtService: JwtService,
+  private readonly supabaseService: SupabaseService,
+  private readonly googleCalendarService: GoogleCalendarService,
+  private readonly mailService: MailService,
+) {}
+
+Adiciona esses dois métodos no auth.service.ts e também importa o MailService no constructor:
+
+constructor(
+  private readonly jwtService: JwtService,
+  private readonly supabaseService: SupabaseService,
+  private readonly googleCalendarService: GoogleCalendarService,
+  private readonly mailService: MailService,
+) {}
+
+import { MailService } from '../mail/mail.service';
+
+No auth.controller.ts precisa adicionar as duas rotas:
+
+@Post('forgot-password')
+forgotPassword(@Body() body: { email: string }) {
+  return this.authService.forgotPassword(body.email);
+}
+
+@Post('reset-password')
+resetPassword(@Body() body: { email: string; code: string; newPassword: string }) {
+  return this.authService.resetPassword(body.email, body.code, body.newPassword);
+}
+
+
+no mail.service.ts precisa adicionar o método sendPasswordReset
+
+async sendPasswordReset(to: string, code: string) {
+  await this.resend.emails.send({
+    from: 'Lume System <onboarding@resend.dev>',
+    to,
+    subject: 'Redefinição de senha',
+    html: `
+      <h2>Redefinição de senha</h2>
+      <p>Seu código para redefinir a senha é:</p>
+      <h1 style="letter-spacing: 8px; color: #333;">${code}</h1>
+      <p>Este código expira em <strong>1 hora</strong>.</p>
+      <p style="color: #999; font-size: 12px;">Se você não solicitou a redefinição de senha, ignore este email.</p>
+    `,
+  });
+}

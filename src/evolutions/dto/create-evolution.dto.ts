@@ -1,6 +1,6 @@
 import { IsDateString, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
-export class CreateAppointmentDto {
+export class CreateEvolutionDto {
   @IsNotEmpty()
   @IsUUID()
   patient_id: string;
@@ -11,7 +11,7 @@ export class CreateAppointmentDto {
 
   @IsNotEmpty()
   @IsString()
-  title: string;
+  consultation_type: string;
 
   @IsNotEmpty()
   @IsDateString()
