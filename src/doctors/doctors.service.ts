@@ -1,26 +1,92 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { UpdateDoctorDto } from './dto/update-doctor.dto';
+import { SupabaseService } from '../supabase/supabase.service';
+import { UploadService } from '../upload/upload.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class DoctorsService {
-  create(createDoctorDto: CreateDoctorDto) {
-    return 'This action adds a new doctor';
+  constructor(
+    private readonly supabaseService: SupabaseService,
+    private readonly uploadService: UploadService,
+  ) { }
+
+  async create(createDoctorDto: CreateDoctorDto) {
+    const hashedPassword = await bcrypt.hash(createDoctorDto.password, 10);
+
+    const { data, error } = await this.supabaseService.supabase
+      .from('doctors')
+      .insert({
+        ...createDoctorDto,
+        password: hashedPassword,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
   }
 
-  findAll() {
-    return `This action returns all doctors`;
+  async findAll() {
+    const { data, error } = await this.supabaseService.supabase
+      .from('doctors')
+      .select('id, name, email, specialty, crm, phone, profile_picture, created_at');
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} doctor`;
+  async findOne(id: string) {
+    const { data, error } = await this.supabaseService.supabase
+      .from('doctors')
+      .select('id, name, email, specialty, crm, phone, profile_picture, created_at')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
   }
 
-  update(id: number, updateDoctorDto: UpdateDoctorDto) {
-    return `This action updates a #${id} doctor`;
-  }
+  async update(id: string, updateDoctorDto: UpdateDoctorDto, file?: Express.Multer.File) {
+    if (file) {
+      updateDoctorDto.profile_picture = await this.uploadService.uploadFile(
+        file, process.env.SUPABASE_AVATARS_BUCKET,
+      );
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} doctor`;
-  }
+      if (updateDoctorDto.password) {
+        updateDoctorDto.password = await bcrypt.hash(updateDoctorDto.password, 10);
+      }
+
+      const { data, error } = await this.supabaseService.supabase
+        .from('doctors')
+        .update(updateDoctorDto)
+        .eq('id', id)
+        .select('id, name, email, specialty, crm, phone, profile_picture, created_at')
+        .single();
+
+      if (error) {
+        throw new Error(error.message);
+      }
+      return data;
+    }
+    
+    async remove(id: string) {
+    const { error } = await this.supabaseService.supabase
+      .from('doctors')
+      .delete()
+      .eq('id', id);
+
+    if (error){
+      throw new Error(error.message);
+    }
+    return { message: 'Médico removido com sucesso!' };
+  }  
 }

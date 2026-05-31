@@ -17,6 +17,7 @@ export class GoogleCalendarService {
         return this.oauth2Client.generateAuthUrl({
             access_type: 'offline',
             scope: ['https://www.googleapis.com/auth/calendar'],
+            state: doctorId,
         });
     }
 
