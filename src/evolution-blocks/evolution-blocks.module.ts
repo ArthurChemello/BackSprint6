@@ -1,9 +1,12 @@
 import { Module } from '@nestjs/common';
-import { EvolutionBlocksController } from './evolution-blocks.controller';
 import { EvolutionBlocksService } from './evolution-blocks.service';
+import { EvolutionBlocksController } from './evolution-blocks.controller';
+import { UploadModule } from '../upload/upload.module';
 
 @Module({
+  imports: [UploadModule],
   controllers: [EvolutionBlocksController],
-  providers: [EvolutionBlocksService]
+  providers: [EvolutionBlocksService],
+  exports: [EvolutionBlocksService],
 })
 export class EvolutionBlocksModule {}
