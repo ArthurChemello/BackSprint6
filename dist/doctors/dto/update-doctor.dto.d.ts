@@ -1,5 +1,9 @@
-import { CreateDoctorDto } from './create-doctor.dto';
-declare const UpdateDoctorDto_base: import("@nestjs/mapped-types").MappedType<Partial<CreateDoctorDto>>;
-export declare class UpdateDoctorDto extends UpdateDoctorDto_base {
+export declare class UpdateDoctorDto {
+    name?: string;
+    email?: string;
+    password?: string;
+    specialty?: string;
+    crm?: string;
+    phone?: string;
+    profile_picture?: string;
 }
-export {};

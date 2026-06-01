@@ -12,7 +12,7 @@ import { GuardiansModule } from './guardians/guardians.module';
 import { DoctorPatientsModule } from './doctor-patients/doctor-patients.module';
 import { AccessCodesModule } from './access-codes/access-codes.module';
 import { EvolutionsModule } from './evolutions/evolutions.module';
-import { EvolutionBlocksModule } from './evolution-blocks/evolution-block.module';
+import { EvolutionBlocksModule } from './evolution-blocks/evolution-blocks.module';
 
 @Module({
   imports: [
