@@ -37,4 +37,6 @@ export class DoctorPatientsController {
     remove(@Param('id') id: string) {
         return this.doctorPatientsService.remove(id);
     }
+
+    //buscar paciente e médico por nome, fazer a busca de forma com nome errado e retornar pessoas com nome igual(todas);
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { EvolutionsService } from './evolutions.service';
 import { CreateEvolutionDto } from './dto/create-evolution.dto';
 import { UpdateEvolutionDto } from './dto/update-evolution.dto';
@@ -16,8 +16,8 @@ export class EvolutionsController {
 
     @UseGuards(JwtGuard)
     @Get('patient/:patientId')
-    findByPatient(@Param('patientId') patientId: string) {
-        return this.evolutionsService.findByPatient(patientId);
+    findByPatient(@Param('patientId') patientId: string, @Query('doctorId') doctorId: string) {
+        return this.evolutionsService.findByPatient(patientId, doctorId);
     }
 
     @UseGuards(JwtGuard)

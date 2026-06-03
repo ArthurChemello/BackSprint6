@@ -25,8 +25,8 @@ let EvolutionsController = class EvolutionsController {
     create(createEvolutionDto) {
         return this.evolutionsService.create(createEvolutionDto);
     }
-    findByPatient(patientId) {
-        return this.evolutionsService.findByPatient(patientId);
+    findByPatient(patientId, doctorId) {
+        return this.evolutionsService.findByPatient(patientId, doctorId);
     }
     findByDoctor(doctorId) {
         return this.evolutionsService.findByDoctor(doctorId);
@@ -54,8 +54,9 @@ __decorate([
     (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
     (0, common_1.Get)('patient/:patientId'),
     __param(0, (0, common_1.Param)('patientId')),
+    __param(1, (0, common_1.Query)('doctorId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], EvolutionsController.prototype, "findByPatient", null);
 __decorate([

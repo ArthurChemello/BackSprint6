@@ -5,7 +5,7 @@ export declare class EvolutionsService {
     private readonly supabaseService;
     constructor(supabaseService: SupabaseService);
     create(createEvolutionDto: CreateEvolutionDto): Promise<any>;
-    findByPatient(patientId: string): Promise<any[]>;
+    findByPatient(patientId: string, doctorId: string): Promise<any[]>;
     findByDoctor(doctorId: string): Promise<any[]>;
     findOne(id: string): Promise<any>;
     update(id: string, updateEvolutionDto: UpdateEvolutionDto): Promise<any>;

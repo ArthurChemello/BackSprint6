@@ -20,7 +20,17 @@ export class EvolutionsService {
         return data;
     }
 
-    async findByPatient(patientId: string) {
+    async findByPatient(patientId: string, doctorId: string) {
+        const { data: link } = await this.supabaseService.supabase
+            .from('doctor_patients')
+            .select('access_type, status')
+            .eq('doctor_id', doctorId)
+            .eq('patient_id', patientId)
+            .eq('status', 'active')
+            .single();
+
+        if (!link) throw new Error('Acesso negado!');
+
         const { data, error } = await this.supabaseService.supabase
             .from('evolutions')
             .select('*, evolution_blocks(*), doctors(name, specialty)')

@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { SupabaseService } from '../supabase/supabase.service';
 import { GoogleCalendarService } from '../google-calendar/google-calendar.service';
+import { MailService } from '../mail/mail.service';
 import * as  bcrypt from 'bcrypt';
 
 @Injectable()
@@ -10,6 +11,7 @@ export class AuthService {
         private readonly jwtService: JwtService,
         private readonly supabaseService: SupabaseService,
         private readonly googleCalendarService: GoogleCalendarService,
+        private readonly mailService: MailService,
     ) { }
 
     async loginDoctor(email: string, password: string) {
@@ -78,5 +80,71 @@ export class AuthService {
             });
 
         return { message: 'Google Calendar conectado com sucesso!' };
+    }
+
+    async forgotPassword(email: string) {
+        const { data: doctor } = await this.supabaseService.supabase
+            .from('doctors')
+            .select('id, email')
+            .eq('email', email)
+            .single();
+
+        const { data: patient } = await this.supabaseService.supabase
+            .from('patients')
+            .select('id, email')
+            .eq('email', email)
+            .single();
+
+        if (!doctor && !patient) {
+            throw new Error('Email não encontrado');
+        }
+
+        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const expires_at = new Date(Date.now() + 60 * 60 * 1000);
+
+        await this.supabaseService.supabase
+            .from('password_resets')
+            .insert({ email, code, expires_at });
+
+        await this.mailService.sendPasswordReset(email, code);
+
+        return { message: 'Código enviado para o email!' };
+    }
+
+    async resetPassword(email: string, code: string, newPassword: string) {
+        const { data: reset } = await this.supabaseService.supabase
+            .from('password_resets')
+            .select('*')
+            .eq('email', email)
+            .eq('code', code)
+            .eq('used', false)
+            .single();
+
+        if (!reset) {
+            throw new Error('Código inválido');
+        }
+
+        if (new Date() > new Date(reset.expires_at)) {
+            throw new Error('Código expirado');
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        await this.supabaseService.supabase
+            .from('doctors')
+            .update({ password: hashedPassword })
+            .eq('email', email);
+
+        await this.supabaseService.supabase
+            .from('patients')
+            .update({ password: hashedPassword, first_login: false })
+            .eq('email', email);
+
+        await this.supabaseService.supabase
+            .from('password_resets')
+            .update({ used: true })
+            .eq('id', reset.id);
+
+        return { message: 'Senha alterada com sucesso!' };
     }
 }

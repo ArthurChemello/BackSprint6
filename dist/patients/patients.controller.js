@@ -28,14 +28,17 @@ let PatientsController = class PatientsController {
     findAll() {
         return this.patientsService.findAll();
     }
-    search(name) {
-        return this.patientsService.searchByName(name);
+    searchByName(name, doctorId) {
+        return this.patientsService.searchByName(name, doctorId);
     }
     findOne(id) {
         return this.patientsService.findOne(id);
     }
     update(id, updatePatientDto) {
         return this.patientsService.update(id, updatePatientDto);
+    }
+    searchByNameForDoctor(doctorId, name) {
+        return this.patientsService.searchByNameForDoctor(name, doctorId);
     }
     remove(id) {
         return this.patientsService.remove(id);
@@ -61,10 +64,11 @@ __decorate([
     (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
     (0, common_1.Get)('search'),
     __param(0, (0, common_1.Query)('name')),
+    __param(1, (0, common_1.Query)('doctorId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
-], PatientsController.prototype, "search", null);
+], PatientsController.prototype, "searchByName", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
     (0, common_1.Get)(':id'),
@@ -82,6 +86,15 @@ __decorate([
     __metadata("design:paramtypes", [String, update_patient_dto_1.UpdatePatientDto]),
     __metadata("design:returntype", void 0)
 ], PatientsController.prototype, "update", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    (0, common_1.Get)('search/doctor/:doctorId'),
+    __param(0, (0, common_1.Param)('doctorId')),
+    __param(1, (0, common_1.Query)('name')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", void 0)
+], PatientsController.prototype, "searchByNameForDoctor", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
     (0, common_1.Delete)(':id'),

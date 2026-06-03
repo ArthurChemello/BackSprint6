@@ -75,11 +75,35 @@ let PatientsService = class PatientsService {
         }
         return data;
     }
-    async searchByName(name) {
+    async searchByName(name, doctorId) {
+        const { data, error } = await this.supabaseService.supabase
+            .from('patients')
+            .select('id, name, city')
+            .or(`name.ilike.%${name}%,name_search.fts.${name}`);
+        if (error) {
+            throw new Error(error.message);
+        }
+        const { data: links } = await this.supabaseService.supabase
+            .from('doctor_patients')
+            .select('patient_id, access_type, status')
+            .eq('doctor_id', doctorId);
+        return data.map((patient) => {
+            var _a, _b;
+            const link = links === null || links === void 0 ? void 0 : links.find((l) => l.patient_id === patient.id);
+            return Object.assign(Object.assign({}, patient), { access_type: (_a = link === null || link === void 0 ? void 0 : link.access_type) !== null && _a !== void 0 ? _a : null, status: (_b = link === null || link === void 0 ? void 0 : link.status) !== null && _b !== void 0 ? _b : null });
+        });
+    }
+    async searchByNameForDoctor(name, doctorId) {
+        const { data: links } = await this.supabaseService.supabase
+            .from('doctor_patients')
+            .select('patient_id')
+            .eq('doctor_id', doctorId);
+        const patientIds = links.map((link) => link.patient_id);
         const { data, error } = await this.supabaseService.supabase
             .from('patients')
             .select('id, name, birth_date, phone, email, cpf, address, city, profession, origin, allergies, chronic_diseases, current_medications, blood_type, first_login, created_at')
-            .ilike('name', `%${name}%`);
+            .in('id', patientIds)
+            .or(`name.ilike.%${name}%,name_search.fts.${name}`);
         if (error) {
             throw new Error(error.message);
         }

@@ -158,3 +158,18 @@ async sendPasswordReset(to: string, code: string) {
     `,
   });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+adicionar autentificador de cpf

@@ -23,7 +23,14 @@ export declare class PatientsService {
         first_login: any;
         created_at: any;
     }[]>;
-    searchByName(name: string): Promise<{
+    searchByName(name: string, doctorId: string): Promise<{
+        access_type: any;
+        status: any;
+        id: any;
+        name: any;
+        city: any;
+    }[]>;
+    searchByNameForDoctor(name: string, doctorId: string): Promise<{
         id: any;
         name: any;
         birth_date: any;

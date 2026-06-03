@@ -6,7 +6,7 @@ import { JwtGuard } from '../auth/guards/jwt.guard';
 
 @Controller('patients')
 export class PatientsController {
-  constructor(private readonly patientsService: PatientsService) {}
+  constructor(private readonly patientsService: PatientsService) { }
 
   @UseGuards(JwtGuard)
   @Post()
@@ -22,8 +22,11 @@ export class PatientsController {
 
   @UseGuards(JwtGuard)
   @Get('search')
-  search(@Query('name') name: string) {
-    return this.patientsService.searchByName(name);
+  searchByName(
+    @Query('name') name: string,
+    @Query('doctorId') doctorId: string,
+  ) {
+    return this.patientsService.searchByName(name, doctorId);
   }
 
   @UseGuards(JwtGuard)
@@ -36,6 +39,15 @@ export class PatientsController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePatientDto: UpdatePatientDto) {
     return this.patientsService.update(id, updatePatientDto);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('search/doctor/:doctorId')
+  searchByNameForDoctor(
+    @Param('doctorId') doctorId: string,
+    @Query('name') name: string,
+  ) {
+    return this.patientsService.searchByNameForDoctor(name, doctorId);
   }
 
   @UseGuards(JwtGuard)

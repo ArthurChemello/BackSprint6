@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreatePatientDto = void 0;
 const class_validator_1 = require("class-validator");
+const cpf_validator_1 = require("../../validators/cpf.validator");
 class CreatePatientDto {
 }
 exports.CreatePatientDto = CreatePatientDto;
@@ -37,6 +38,7 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
+    (0, cpf_validator_1.IsCPF)({ message: 'CPF inválido!' }),
     __metadata("design:type", String)
 ], CreatePatientDto.prototype, "cpf", void 0);
 __decorate([

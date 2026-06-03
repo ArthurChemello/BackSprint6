@@ -20,4 +20,16 @@ export declare class AuthController {
     handleGoogleCallback(code: string, doctorId: string): Promise<{
         message: string;
     }>;
+    forgotPassword(body: {
+        email: string;
+    }): Promise<{
+        message: string;
+    }>;
+    resetPassword(body: {
+        email: string;
+        code: string;
+        newPassword: string;
+    }): Promise<{
+        message: string;
+    }>;
 }

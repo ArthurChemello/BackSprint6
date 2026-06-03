@@ -23,23 +23,12 @@ export declare class PatientsController {
         first_login: any;
         created_at: any;
     }[]>;
-    search(name: string): Promise<{
+    searchByName(name: string, doctorId: string): Promise<{
+        access_type: any;
+        status: any;
         id: any;
         name: any;
-        birth_date: any;
-        phone: any;
-        email: any;
-        cpf: any;
-        address: any;
         city: any;
-        profession: any;
-        origin: any;
-        allergies: any;
-        chronic_diseases: any;
-        current_medications: any;
-        blood_type: any;
-        first_login: any;
-        created_at: any;
     }[]>;
     findOne(id: string): Promise<{
         id: any;
@@ -77,6 +66,24 @@ export declare class PatientsController {
         first_login: any;
         created_at: any;
     }>;
+    searchByNameForDoctor(doctorId: string, name: string): Promise<{
+        id: any;
+        name: any;
+        birth_date: any;
+        phone: any;
+        email: any;
+        cpf: any;
+        address: any;
+        city: any;
+        profession: any;
+        origin: any;
+        allergies: any;
+        chronic_diseases: any;
+        current_medications: any;
+        blood_type: any;
+        first_login: any;
+        created_at: any;
+    }[]>;
     remove(id: string): Promise<{
         message: string;
     }>;

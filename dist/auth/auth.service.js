@@ -47,12 +47,14 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const supabase_service_1 = require("../supabase/supabase.service");
 const google_calendar_service_1 = require("../google-calendar/google-calendar.service");
+const mail_service_1 = require("../mail/mail.service");
 const bcrypt = __importStar(require("bcrypt"));
 let AuthService = class AuthService {
-    constructor(jwtService, supabaseService, googleCalendarService) {
+    constructor(jwtService, supabaseService, googleCalendarService, mailService) {
         this.jwtService = jwtService;
         this.supabaseService = supabaseService;
         this.googleCalendarService = googleCalendarService;
+        this.mailService = mailService;
     }
     async loginDoctor(email, password) {
         const { data: doctor } = await this.supabaseService.supabase
@@ -109,12 +111,64 @@ let AuthService = class AuthService {
         });
         return { message: 'Google Calendar conectado com sucesso!' };
     }
+    async forgotPassword(email) {
+        const { data: doctor } = await this.supabaseService.supabase
+            .from('doctors')
+            .select('id, email')
+            .eq('email', email)
+            .single();
+        const { data: patient } = await this.supabaseService.supabase
+            .from('patients')
+            .select('id, email')
+            .eq('email', email)
+            .single();
+        if (!doctor && !patient) {
+            throw new Error('Email não encontrado');
+        }
+        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const expires_at = new Date(Date.now() + 60 * 60 * 1000);
+        await this.supabaseService.supabase
+            .from('password_resets')
+            .insert({ email, code, expires_at });
+        await this.mailService.sendPasswordReset(email, code);
+        return { message: 'Código enviado para o email!' };
+    }
+    async resetPassword(email, code, newPassword) {
+        const { data: reset } = await this.supabaseService.supabase
+            .from('password_resets')
+            .select('*')
+            .eq('email', email)
+            .eq('code', code)
+            .eq('used', false)
+            .single();
+        if (!reset) {
+            throw new Error('Código inválido');
+        }
+        if (new Date() > new Date(reset.expires_at)) {
+            throw new Error('Código expirado');
+        }
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await this.supabaseService.supabase
+            .from('doctors')
+            .update({ password: hashedPassword })
+            .eq('email', email);
+        await this.supabaseService.supabase
+            .from('patients')
+            .update({ password: hashedPassword, first_login: false })
+            .eq('email', email);
+        await this.supabaseService.supabase
+            .from('password_resets')
+            .update({ used: true })
+            .eq('id', reset.id);
+        return { message: 'Senha alterada com sucesso!' };
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [jwt_1.JwtService,
         supabase_service_1.SupabaseService,
-        google_calendar_service_1.GoogleCalendarService])
+        google_calendar_service_1.GoogleCalendarService,
+        mail_service_1.MailService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

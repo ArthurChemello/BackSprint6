@@ -84,6 +84,16 @@ let DoctorsService = class DoctorsService {
         }
         return data;
     }
+    async searchByName(name) {
+        const { data, error } = await this.supabaseService.supabase
+            .from('doctors')
+            .select('id, name, email, specialty, crm, phone, profile_picture, created_at')
+            .or(`name.ilike.%${name}%,name_search.fts.${name}`);
+        if (error) {
+            throw new Error(error.message);
+        }
+        return data;
+    }
     async update(id, updateDoctorDto, file) {
         if (file) {
             updateDoctorDto.profile_picture = await this.uploadService.uploadFile(file, process.env.SUPABASE_AVATARS_BUCKET);

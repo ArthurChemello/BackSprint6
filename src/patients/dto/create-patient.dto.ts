@@ -1,4 +1,5 @@
 import { IsDateString, IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsCPF } from '../../validators/cpf.validator';
 
 export class CreatePatientDto {
   @IsNotEmpty()
@@ -19,6 +20,7 @@ export class CreatePatientDto {
 
   @IsOptional()
   @IsString()
+  @IsCPF({ message: 'CPF inválido!' })
   cpf?: string;
 
   @IsOptional()

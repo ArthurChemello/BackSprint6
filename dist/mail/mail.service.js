@@ -54,6 +54,20 @@ let MailService = class MailService {
       `,
         });
     }
+    async sendPasswordReset(to, code) {
+        await this.resend.emails.send({
+            from: 'Lume System <onboarding@resend.dev>',
+            to,
+            subject: 'Redefinição de senha',
+            html: `
+          <h2>Redefinição de senha</h2>
+          <p>Seu código para redefinir a senha é:</p>
+          <h1 style="letter-spacing: 8px; color: #333;">${code}</h1>
+          <p>Este código expira em <strong>1 hora</strong>.</p>
+          <p style="color: #999; font-size: 12px;">Se você não solicitou a redefinição de senha, ignore este email.</p>
+      `,
+        });
+    }
 };
 exports.MailService = MailService;
 exports.MailService = MailService = __decorate([

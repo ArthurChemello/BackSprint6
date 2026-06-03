@@ -11,7 +11,7 @@ export class MailService {
   }
 
   async sendAccessCode(patientId: string, doctorName: string, code: string) {
-    
+
     const { data: guardian } = await this.supabaseService.supabase
       .from('guardians')
       .select('email, name')
@@ -49,6 +49,20 @@ export class MailService {
         <p>Passe este código para o médico pessoalmente ou por mensagem.</p>
         <br/>
         <p style="color: #999; font-size: 12px;">Se você não reconhece essa solicitação, ignore este email.</p>
+      `,
+    });
+  }
+  async sendPasswordReset(to: string, code: string) {
+    await this.resend.emails.send({
+      from: 'Lume System <onboarding@resend.dev>',
+      to,
+      subject: 'Redefinição de senha',
+      html: `
+          <h2>Redefinição de senha</h2>
+          <p>Seu código para redefinir a senha é:</p>
+          <h1 style="letter-spacing: 8px; color: #333;">${code}</h1>
+          <p>Este código expira em <strong>1 hora</strong>.</p>
+          <p style="color: #999; font-size: 12px;">Se você não solicitou a redefinição de senha, ignore este email.</p>
       `,
     });
   }

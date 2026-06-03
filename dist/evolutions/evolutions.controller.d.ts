@@ -5,7 +5,7 @@ export declare class EvolutionsController {
     private readonly evolutionsService;
     constructor(evolutionsService: EvolutionsService);
     create(createEvolutionDto: CreateEvolutionDto): Promise<any>;
-    findByPatient(patientId: string): Promise<any[]>;
+    findByPatient(patientId: string, doctorId: string): Promise<any[]>;
     findByDoctor(doctorId: string): Promise<any[]>;
     findOne(id: string): Promise<any>;
     update(id: string, updateEvolutionDto: UpdateEvolutionDto): Promise<any>;

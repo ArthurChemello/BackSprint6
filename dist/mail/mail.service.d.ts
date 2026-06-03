@@ -4,4 +4,5 @@ export declare class MailService {
     private resend;
     constructor(supabaseService: SupabaseService);
     sendAccessCode(patientId: string, doctorName: string, code: string): Promise<void>;
+    sendPasswordReset(to: string, code: string): Promise<void>;
 }

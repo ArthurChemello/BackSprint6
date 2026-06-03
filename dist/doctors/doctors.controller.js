@@ -32,6 +32,9 @@ let DoctorsController = class DoctorsController {
     findOne(id) {
         return this.doctorsService.findOne(id);
     }
+    searchByName(name) {
+        return this.doctorsService.searchByName(name);
+    }
     update(id, updateDoctorDto, file) {
         return this.doctorsService.update(id, updateDoctorDto, file);
     }
@@ -62,6 +65,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], DoctorsController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
+    (0, common_1.Get)('search'),
+    __param(0, (0, common_1.Query)('name')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], DoctorsController.prototype, "searchByName", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_guard_1.JwtGuard),
     (0, common_1.Patch)(':id'),
