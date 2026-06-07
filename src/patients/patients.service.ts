@@ -9,6 +9,17 @@ export class PatientsService {
   constructor(private readonly supabaseService: SupabaseService) { }
 
   async create(createPatientDto: CreatePatientDto) {
+    const email = createPatientDto.email.toLowerCase();
+
+    const { data: existing } = await this.supabaseService.supabase
+      .from('patients')
+      .select('id')
+      .eq('email', email)
+      .single();
+
+    if (existing) {
+      throw new Error('Email já cadastrado!');
+    }
     const birthDate = createPatientDto.birth_date.replace(/-/g, '');
     const city = createPatientDto.city ?? 'semcidade';
     const rawPassword = `${birthDate}${city.replace(/\s/g, '')}`;
@@ -18,7 +29,7 @@ export class PatientsService {
       .from('patients')
       .insert({
         ...createPatientDto,
-        email: createPatientDto.email.toLowerCase(),
+        email,
         password: hashedPassword,
         first_login: true,
       })

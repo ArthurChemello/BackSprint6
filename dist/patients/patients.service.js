@@ -52,13 +52,22 @@ let PatientsService = class PatientsService {
     }
     async create(createPatientDto) {
         var _a;
+        const email = createPatientDto.email.toLowerCase();
+        const { data: existing } = await this.supabaseService.supabase
+            .from('patients')
+            .select('id')
+            .eq('email', email)
+            .single();
+        if (existing) {
+            throw new Error('Email já cadastrado!');
+        }
         const birthDate = createPatientDto.birth_date.replace(/-/g, '');
         const city = (_a = createPatientDto.city) !== null && _a !== void 0 ? _a : 'semcidade';
         const rawPassword = `${birthDate}${city.replace(/\s/g, '')}`;
         const hashedPassword = await bcrypt.hash(rawPassword, 10);
         const { data, error } = await this.supabaseService.supabase
             .from('patients')
-            .insert(Object.assign(Object.assign({}, createPatientDto), { email: createPatientDto.email.toLowerCase(), password: hashedPassword, first_login: true }))
+            .insert(Object.assign(Object.assign({}, createPatientDto), { email, password: hashedPassword, first_login: true }))
             .select()
             .single();
         if (error) {

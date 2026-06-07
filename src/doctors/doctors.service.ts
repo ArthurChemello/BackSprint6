@@ -13,13 +13,25 @@ export class DoctorsService {
   ) { }
 
   async create(createDoctorDto: CreateDoctorDto) {
+
+    const email = createDoctorDto.email.toLowerCase();
+    const { data: existing } = await this.supabaseService.supabase
+      .from('doctors')
+      .select('id')
+      .eq('email', email)
+      .single();
+
+    if (existing) {
+      throw new Error('Email já cadastrado!');
+    }
+
     const hashedPassword = await bcrypt.hash(createDoctorDto.password, 10);
 
     const { data, error } = await this.supabaseService.supabase
       .from('doctors')
       .insert({
         ...createDoctorDto,
-        email: createDoctorDto.email.toLowerCase(),
+        email,
         password: hashedPassword,
       })
       .select()

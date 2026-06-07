@@ -53,10 +53,19 @@ let DoctorsService = class DoctorsService {
         this.uploadService = uploadService;
     }
     async create(createDoctorDto) {
+        const email = createDoctorDto.email.toLowerCase();
+        const { data: existing } = await this.supabaseService.supabase
+            .from('doctors')
+            .select('id')
+            .eq('email', email)
+            .single();
+        if (existing) {
+            throw new Error('Email já cadastrado!');
+        }
         const hashedPassword = await bcrypt.hash(createDoctorDto.password, 10);
         const { data, error } = await this.supabaseService.supabase
             .from('doctors')
-            .insert(Object.assign(Object.assign({}, createDoctorDto), { email: createDoctorDto.email.toLowerCase(), password: hashedPassword }))
+            .insert(Object.assign(Object.assign({}, createDoctorDto), { email, password: hashedPassword }))
             .select()
             .single();
         if (error) {
