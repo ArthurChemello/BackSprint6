@@ -16,7 +16,7 @@ import { EvolutionBlocksModule } from './evolution-blocks/evolution-blocks.modul
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: 'Secret.env' }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env', 'Secret.env'] }),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 10 }]),
     SupabaseModule,
     GoogleCalendarModule,
