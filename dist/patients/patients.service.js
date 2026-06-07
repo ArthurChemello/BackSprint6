@@ -58,7 +58,7 @@ let PatientsService = class PatientsService {
         const hashedPassword = await bcrypt.hash(rawPassword, 10);
         const { data, error } = await this.supabaseService.supabase
             .from('patients')
-            .insert(Object.assign(Object.assign({}, createPatientDto), { password: hashedPassword, first_login: true }))
+            .insert(Object.assign(Object.assign({}, createPatientDto), { email: createPatientDto.email.toLowerCase(), password: hashedPassword, first_login: true }))
             .select()
             .single();
         if (error) {

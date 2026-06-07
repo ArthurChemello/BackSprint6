@@ -60,7 +60,7 @@ let AuthService = class AuthService {
         const { data: doctor } = await this.supabaseService.supabase
             .from('doctors')
             .select('*')
-            .eq('email', email)
+            .eq('email', email.toLowerCase())
             .single();
         if (!doctor) {
             throw new common_1.UnauthorizedException('Credenciais inválidas');
@@ -80,7 +80,7 @@ let AuthService = class AuthService {
         const { data: patient } = await this.supabaseService.supabase
             .from('patients')
             .select('*')
-            .eq('email', email)
+            .eq('email', email.toLowerCase())
             .single();
         if (!patient) {
             throw new common_1.UnauthorizedException('Credenciais inválidas');
