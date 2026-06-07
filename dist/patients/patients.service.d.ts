@@ -1,0 +1,90 @@
+import { CreatePatientDto } from './dto/create-patient.dto';
+import { UpdatePatientDto } from './dto/update-patient.dto';
+import { SupabaseService } from '../supabase/supabase.service';
+export declare class PatientsService {
+    private readonly supabaseService;
+    constructor(supabaseService: SupabaseService);
+    create(createPatientDto: CreatePatientDto): Promise<any>;
+    findAll(): Promise<{
+        id: any;
+        name: any;
+        birth_date: any;
+        phone: any;
+        email: any;
+        cpf: any;
+        address: any;
+        city: any;
+        profession: any;
+        origin: any;
+        allergies: any;
+        chronic_diseases: any;
+        current_medications: any;
+        blood_type: any;
+        first_login: any;
+        created_at: any;
+    }[]>;
+    searchByName(name: string, doctorId: string): Promise<{
+        access_type: any;
+        status: any;
+        id: any;
+        name: any;
+        city: any;
+    }[]>;
+    searchByNameForDoctor(name: string, doctorId: string): Promise<{
+        id: any;
+        name: any;
+        birth_date: any;
+        phone: any;
+        email: any;
+        cpf: any;
+        address: any;
+        city: any;
+        profession: any;
+        origin: any;
+        allergies: any;
+        chronic_diseases: any;
+        current_medications: any;
+        blood_type: any;
+        first_login: any;
+        created_at: any;
+    }[]>;
+    findOne(id: string): Promise<{
+        id: any;
+        name: any;
+        birth_date: any;
+        phone: any;
+        email: any;
+        cpf: any;
+        address: any;
+        city: any;
+        profession: any;
+        origin: any;
+        allergies: any;
+        chronic_diseases: any;
+        current_medications: any;
+        blood_type: any;
+        first_login: any;
+        created_at: any;
+    }>;
+    update(id: string, updatePatientDto: UpdatePatientDto): Promise<{
+        id: any;
+        name: any;
+        birth_date: any;
+        phone: any;
+        email: any;
+        cpf: any;
+        address: any;
+        city: any;
+        profession: any;
+        origin: any;
+        allergies: any;
+        chronic_diseases: any;
+        current_medications: any;
+        blood_type: any;
+        first_login: any;
+        created_at: any;
+    }>;
+    remove(id: string): Promise<{
+        message: string;
+    }>;
+}

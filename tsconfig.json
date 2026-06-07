@@ -15,5 +15,6 @@
     "strictNullChecks": false,
     "noImplicitAny": false,
     "types": ["node", "jest", "multer"]
-  }
+  },
+  "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
 }
