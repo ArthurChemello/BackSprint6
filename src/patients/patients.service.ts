@@ -18,6 +18,7 @@ export class PatientsService {
       .from('patients')
       .insert({
         ...createPatientDto,
+        email: createPatientDto.email.toLowerCase(),
         password: hashedPassword,
         first_login: true,
       })

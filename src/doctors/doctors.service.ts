@@ -19,6 +19,7 @@ export class DoctorsService {
       .from('doctors')
       .insert({
         ...createDoctorDto,
+        email: createDoctorDto.email.toLowerCase(),
         password: hashedPassword,
       })
       .select()

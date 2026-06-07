@@ -18,7 +18,7 @@ export class AuthService {
         const { data: doctor } = await this.supabaseService.supabase
             .from('doctors')
             .select('*')
-            .eq('email', email)
+            .eq('email', email.toLowerCase())
             .single();
 
         if (!doctor) {
@@ -43,7 +43,7 @@ export class AuthService {
         const { data: patient } = await this.supabaseService.supabase
             .from('patients')
             .select('*')
-            .eq('email', email)
+            .eq('email', email.toLowerCase())
             .single();
 
         if (!patient) {
