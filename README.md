@@ -18,6 +18,13 @@
   - [Access Codes](#access-codes)
 - [Como Usar no Frontend](#como-usar-no-frontend)
 - [Exemplos Práticos](#exemplos-práticos)
+- [Doctor Search](#doctor-search)
+- [Patients Search](#patients-search)
+- [Sistema de Emails](#sistema-de-emails)
+- [Senha Inicial do Paciente](#senha-inicial-do-paciente)
+- [Upload de Arquivos](#upload-de-arquivos)
+- [Tratamento de Erros](#tratamento-de-erros)
+
 
 ---
 
@@ -39,7 +46,7 @@ O **Lume System** é uma API RESTful desenvolvida com **NestJS** e **TypeScript*
 ## URL Base
 
 ```
-http://56.124.126.184:3010
+http://13.216.250.227:3010
 ```
 
 Todas as rotas devem ser prefixadas com essa URL base.
@@ -202,6 +209,7 @@ Solicita redefinição de senha.
 **Resposta de sucesso (200):**
 ```json
 {
+{
   "message": "Código enviado para o email!"
 }
 ```
@@ -301,6 +309,20 @@ Busca um médico pelo ID.
 | Parâmetro | Tipo | Descrição |
 |-----------|------|-----------|
 | id | UUID | ID do médico |
+
+**Resposta de sucesso (200):**
+```json
+{
+  "id": "uuid",
+  "name": "Dr. João Silva",
+  "email": "medico@email.com",
+  "specialty": "Psicólogo",
+  "crm": "12345",
+  "phone": "51999999999",
+  "profile_picture": null,
+  "created_at": "2026-01-01T00:00:00Z"
+}
+```
 
 ---
 
@@ -415,8 +437,48 @@ Busca pacientes pelo nome (busca parcial).
 |-----------|------|-------------|-----------|
 | name | string | Sim | Nome ou parte do nome |
 
+**Resposta de sucesso (200):**
+```json
+{
+  "id": "uuid",
+  "name": "Maria Souza",
+  "email": "maria@email.com",
+  "phone": "51999999999",
+  "first_login": false
+}
+```
+
 **Exemplo:** `/patients/search?name=Maria`
 
+---
+
+### GET /patients/search/doctor/:doctorId?name=NOME
+
+Busca pacientes vinculados a um médico filtrando pelo nome.
+
+**Requer autenticação.**
+
+**Parâmetros:**
+| Parâmetro | Tipo | 
+|-----------|------|
+| doctorId | UUID | 
+
+
+**Parâmetros:**
+| Parâmetro | Tipo | 
+|-----------|------|
+| name | string | 
+
+**Exemplo:** `GET /patients/search/doctor/uuid-do-medico?name=maria`  
+**Resposta de sucesso (200):**
+```json
+  {
+    "id": "uuid",
+    "name": "Maria Souza",
+    "email": "maria@email.com",
+    "phone": "51999999999"
+  }
+```
 ---
 
 ### GET /patients/:id
@@ -424,6 +486,22 @@ Busca pacientes pelo nome (busca parcial).
 Busca um paciente pelo ID.
 
 **Requer autenticação.**
+
+**Resposta de sucesso (200):**
+```json
+{
+  "id": "uuid",
+  "name": "Maria Souza",
+  "birth_date": "1990-05-15",
+  "phone": "51999999999",
+  "email": "maria@email.com",
+  "cpf": "12345678900",
+  "city": "Porto Alegre",
+  "profession": "Professora",
+  "blood_type": "A+",
+  "first_login": false
+}
+```
 
 ---
 
@@ -691,6 +769,16 @@ Lista todas as evoluções de um paciente com os blocos de conteúdo incluídos.
 
 **Requer autenticação.**
 
+**Resposta de sucesso (200):**
+```json
+{
+  "id": "uuid",
+  "consultation_type": "retorno",
+  "date": "2026-06-15",
+    "blocks": []
+}
+```
+
 ---
 
 ### GET /evolutions/doctor/:doctorId
@@ -707,6 +795,18 @@ Busca uma evolução pelo ID com todos os blocos de conteúdo.
 
 **Requer autenticação.**
 
+**Resposta de sucesso (200):**
+```json
+{
+  "id": "uuid",
+  "patient_id": "uuid",
+  "doctor_id": "uuid",
+  "consultation_type": "retorno",
+  "date": "2026-06-15",
+  "blocks": []
+
+}
+```
 ---
 
 ### PATCH /evolutions/:id
@@ -780,6 +880,16 @@ Lista todos os blocos de uma evolução ordenados pelo campo `order`.
 
 **Requer autenticação.**
 
+**Resposta de sucesso (200):**
+```json
+{
+  "id": "uuid",
+  "section": "clinico",
+  "type": "texto",
+  "content": "Paciente apresenta melhora.",
+  "order": 1
+}
+```
 ---
 
 ### GET /evolution-blocks/:id
@@ -848,6 +958,16 @@ Lista todos os pacientes vinculados a um médico.
 
 **Requer autenticação.**
 
+**Resposta de sucesso (200):**
+```json
+  {
+    "id": "uuid",
+    "patient_id": "uuid",
+    "status": "active",
+    "access_type": "full"
+  }
+```
+
 ---
 
 ### GET /doctor-patients/patient/:patientId
@@ -855,6 +975,17 @@ Lista todos os pacientes vinculados a um médico.
 Lista todos os médicos vinculados a um paciente.
 
 **Requer autenticação.**
+
+**Resposta de sucesso (200):**
+```json
+  {
+    "id": "uuid",
+    "doctor_id": "uuid",
+    "status": "active",
+    "access_type": "full"
+  }
+```
+
 
 ---
 
@@ -1108,3 +1239,142 @@ await api.patch(`/doctors/${doctorId}`, formData, {
 - O Google Calendar só funciona se o médico tiver autorizado o acesso via `/auth/google`
 - Códigos de acesso expiram em **24 horas** e só podem ser usados **uma vez**
 - Códigos de recuperação de senha expiram em **1 hora**
+
+## Doctor Search
+
+### 1. Busca de médicos por nome.
+
+### GET /doctors/search?name=NOME
+
+`Realiza busca parcial pelo nome do médico.`
+`Requer autenticação.`
+
+**Query Params:**
+| Parâmetro | Tipo | Obrigatório | Descrição |
+|-----------|------|-------------|-----------|
+| name | string  | Sim | Nome ou parte do nome |
+
+Exemplo:
+GET /doctors/search?name=joao
+
+**Resposta de sucesso (200):**
+```json
+{
+  "id": "uuid",
+  "name": "Dr. João Silva",
+  "email": "medico@email.com",
+  "specialty": "Psicólogo",
+  "crm": "12345",
+  "phone": "51999999999",
+  "profile_picture": null
+}
+```
+
+---
+
+## Sistema de Emails
+
+A API utiliza o serviço Resend para envio automático de emails.
+### Criação de consulta
+
+**Ao criar uma consulta:**
+-	Um evento é criado no Google Calendar do médico.
+- O paciente recebe um email contendo:
+  -	Data da consulta
+  - Horário da consulta
+  - Informações do profissional
+
+### Recuperação de senha
+
+**Ao utilizar:**
+POST /auth/forgot-password
+  - usuário recebe um código de recuperação de 6 caracteres.
+`Liberação de acesso ao prontuário`
+
+**Ao utilizar:**
+POST /access-codes/request
+  - paciente recebe um código de autorização para liberar acesso ao prontuário para outro profissional.
+
+**O código:**
+-	possui 6 caracteres;
+-	expira em 24 horas;
+-	pode ser utilizado apenas uma vez.
+
+---
+
+## Senha Inicial do Paciente
+
+**Quando um paciente é criado, uma senha inicial é gerada automaticamente utilizando:**
+-	Data de nascimento (sem separadores)
+-	Cidade (sem espaços)
+
+Exemplo:
+`Data de nascimento:`
+1990-05-15
+`Cidade:`
+Porto Alegre
+
+**Senha gerada:**
+`19900515PortoAlegre`
+
+Após o primeiro login o paciente deve alterar sua senha.
+
+**Enquanto o campo:**
+first_login = true
+o frontend deve redirecionar automaticamente para a tela de alteração de senha.
+
+---
+
+## Upload de Arquivos
+
+**Tipos aceitos:**
+-	JPG
+-	JPEG
+-	PNG
+-	WEBP
+
+**Rotas que aceitam upload:**
+-	`PATCH /doctors/:id`
+-	`POST /evolution-blocks`
+-	`PATCH /evolution-blocks/:id`
+
+**Formato:**
+multipart/form-data
+
+---
+
+## Tratamento de Erros
+
+**400 - Dados inválidos**
+```json
+{
+  "statusCode": 400,
+  "message": "Dados inválidos",
+  "error": "Bad Request"
+}
+```
+
+**401 - Não autorizado**
+```json
+{
+  "statusCode": 401,
+  "message": "Unauthorized"
+}
+```
+
+**404 - Recurso não encontrado**
+```json
+{
+  "statusCode": 404,
+  "message": "Paciente não encontrado"
+}
+```
+
+**500 - Erro interno**
+```json
+{
+  "statusCode": 500,
+  "message": "Internal server error"
+}
+```
+---
