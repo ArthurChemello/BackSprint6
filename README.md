@@ -19,7 +19,6 @@
 - [Como Usar no Frontend](#como-usar-no-frontend)
 - [Exemplos Práticos](#exemplos-práticos)
 - [Doctor Search](#doctor-search)
-- [Patients Search](#patients-search)
 - [Sistema de Emails](#sistema-de-emails)
 - [Senha Inicial do Paciente](#senha-inicial-do-paciente)
 - [Upload de Arquivos](#upload-de-arquivos)
