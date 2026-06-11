@@ -112,15 +112,16 @@ let AuthService = class AuthService {
         return { message: 'Google Calendar conectado com sucesso!' };
     }
     async forgotPassword(email) {
+        const emailLower = email.toLowerCase();
         const { data: doctor } = await this.supabaseService.supabase
             .from('doctors')
             .select('id, email')
-            .eq('email', email)
+            .eq('email', emailLower)
             .single();
         const { data: patient } = await this.supabaseService.supabase
             .from('patients')
             .select('id, email')
-            .eq('email', email)
+            .eq('email', emailLower)
             .single();
         if (!doctor && !patient) {
             throw new Error('Email não encontrado');
@@ -129,8 +130,8 @@ let AuthService = class AuthService {
         const expires_at = new Date(Date.now() + 60 * 60 * 1000);
         await this.supabaseService.supabase
             .from('password_resets')
-            .insert({ email, code, expires_at });
-        await this.mailService.sendPasswordReset(email, code);
+            .insert({ email: emailLower, code, expires_at });
+        await this.mailService.sendPasswordReset(emailLower, code);
         return { message: 'Código enviado para o email!' };
     }
     async resetPassword(email, code, newPassword) {

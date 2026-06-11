@@ -83,16 +83,17 @@ export class AuthService {
     }
 
     async forgotPassword(email: string) {
+        const emailLower = email.toLowerCase();
         const { data: doctor } = await this.supabaseService.supabase
             .from('doctors')
             .select('id, email')
-            .eq('email', email)
+            .eq('email', emailLower)
             .single();
 
         const { data: patient } = await this.supabaseService.supabase
             .from('patients')
             .select('id, email')
-            .eq('email', email)
+            .eq('email', emailLower)
             .single();
 
         if (!doctor && !patient) {
@@ -104,9 +105,9 @@ export class AuthService {
 
         await this.supabaseService.supabase
             .from('password_resets')
-            .insert({ email, code, expires_at });
+            .insert({ email: emailLower, code, expires_at });
 
-        await this.mailService.sendPasswordReset(email, code);
+        await this.mailService.sendPasswordReset(emailLower, code);
 
         return { message: 'Código enviado para o email!' };
     }
