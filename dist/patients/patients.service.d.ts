@@ -28,7 +28,18 @@ export declare class PatientsService {
         status: any;
         id: any;
         name: any;
+        birth_date: any;
+        phone: any;
+        email: any;
+        cpf: any;
+        address: any;
         city: any;
+        profession: any;
+        origin: any;
+        allergies: any;
+        chronic_diseases: any;
+        current_medications: any;
+        blood_type: any;
     }[]>;
     searchByNameForDoctor(name: string, doctorId: string): Promise<{
         id: any;
