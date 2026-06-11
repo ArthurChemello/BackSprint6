@@ -56,7 +56,7 @@ export class PatientsService {
   async searchByName(name: string, doctorId: string) {
     const { data, error } = await this.supabaseService.supabase
       .from('patients')
-      .select('id, name, city')
+      .select('id, name, birth_date, phone, email, cpf, address, city, profession, origin, allergies, chronic_diseases, current_medications, blood_type')
       .or(`name.ilike.%${name}%,name_search.fts.${name}`);
 
     if (error) {
